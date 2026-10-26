@@ -1,0 +1,475 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRpair Image Studio - محول وتعديل مقاسات الصور الاحترافي</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
+
+    <!-- Header Section (Branding: IRpair, هشام عيد, 01001220551) -->
+    <header class="py-5 px-4 md:px-10 border-b border-slate-800 backdrop-blur-md bg-slate-900/80 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-emerald-600 to-teal-500 p-3 rounded-2xl shadow-lg shadow-emerald-900/40 text-slate-950 font-black">
+                    <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl md:text-2xl font-black bg-gradient-to-r from-emerald-400 via-teal-300 to-sky-400 bg-clip-text text-transparent">IRpair Image Studio</h1>
+                        <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">PNG Pro</span>
+                    </div>
+                    <p class="text-xs text-slate-400">تحويل فوري إلى PNG وتعديل دقيق للأبعاد</p>
+                </div>
+            </div>
+            
+            <!-- Branding Badge: Workshop, Developer & Phone -->
+            <div class="flex flex-wrap items-center justify-center gap-3 bg-slate-900/90 px-4 py-2.5 rounded-2xl border border-slate-800 shadow-xl">
+                <div class="flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-store text-emerald-400"></i>
+                    <span class="text-slate-400">الورشة:</span>
+                    <span class="font-bold text-emerald-300">IRpair</span>
+                </div>
+                <span class="text-slate-700">|</span>
+                <div class="flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-code text-teal-400"></i>
+                    <span class="text-slate-400">المطور:</span>
+                    <span class="font-bold text-slate-200">هشام عيد</span>
+                </div>
+                <span class="text-slate-700">|</span>
+                <div class="flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-phone text-sky-400"></i>
+                    <span class="font-bold text-sky-300 font-mono tracking-wide" dir="ltr">01001220551</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Upload & Controls (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Upload Box Card (Drag-and-Drop & File Picker) -->
+            <div id="drop-zone" class="relative group border-2 border-dashed border-slate-700 hover:border-emerald-500 transition-all rounded-3xl p-6 text-center bg-slate-900/50 hover:bg-slate-900/90 cursor-pointer shadow-xl">
+                <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" title="اختر صورة">
+                <div class="flex flex-col items-center justify-center space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-slate-200">اسحب الصورة هنا أو <span class="text-emerald-400 underline">اضغط لاختيار ملف</span></p>
+                        <p class="text-[11px] text-slate-400 mt-1">يدعم صيغ JPG, PNG, WEBP, BMP, GIF</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Panel (Hidden until image is loaded) -->
+            <div id="controls-section" class="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6 hidden backdrop-blur-sm">
+                
+                <!-- Panel Header -->
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <h2 class="text-sm font-bold flex items-center gap-2 text-emerald-400">
+                        <i class="fa-solid fa-sliders"></i> لوحة التحكم الدقيق في الأبعاد
+                    </h2>
+                    <button id="reset-btn" type="button" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 transition-colors bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20">
+                        <i class="fa-solid fa-rotate-right"></i> استعادة الأصلي
+                    </button>
+                </div>
+
+                <!-- Quick Percentage Scale Buttons (25%, 50%, 75%, 100%, 200%) -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-300">أزرار التحجيم السريع النسبي:</label>
+                    <div class="grid grid-cols-5 gap-1.5">
+                        <button type="button" class="preset-btn bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-slate-300 text-xs font-bold py-2 rounded-xl transition-all border border-slate-700" data-scale="25">25%</button>
+                        <button type="button" class="preset-btn bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-slate-300 text-xs font-bold py-2 rounded-xl transition-all border border-slate-700" data-scale="50">50%</button>
+                        <button type="button" class="preset-btn bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-slate-300 text-xs font-bold py-2 rounded-xl transition-all border border-slate-700" data-scale="75">75%</button>
+                        <button type="button" class="preset-btn bg-emerald-600 text-slate-950 text-xs font-black py-2 rounded-xl transition-all shadow border border-emerald-500" data-scale="100">100%</button>
+                        <button type="button" class="preset-btn bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-slate-300 text-xs font-bold py-2 rounded-xl transition-all border border-slate-700" data-scale="200">200%</button>
+                    </div>
+                </div>
+
+                <!-- Precise Manual Dimension Inputs (Width & Height) -->
+                <div class="space-y-4 pt-2 border-t border-slate-800">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1.5 font-medium">العرض (Width - px):</label>
+                            <input type="number" id="input-width" min="1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 font-mono focus:outline-none focus:border-emerald-500 transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1.5 font-medium">الارتفاع (Height - px):</label>
+                            <input type="number" id="input-height" min="1" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 font-mono focus:outline-none focus:border-emerald-500 transition-colors">
+                        </div>
+                    </div>
+
+                    <!-- Maintain Aspect Ratio Checkbox (Default OFF) -->
+                    <div class="flex items-center gap-2 bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+                        <input type="checkbox" id="lock-aspect" class="w-4 h-4 accent-emerald-500 rounded cursor-pointer">
+                        <label for="lock-aspect" class="text-xs text-slate-300 cursor-pointer select-none flex items-center gap-2 font-medium">
+                            <i class="fa-solid fa-link-slash text-slate-500" id="lock-icon"></i> الحفاظ على نسبة الأبعاد (Maintain Aspect Ratio)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Output Info -->
+                <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                    <span>صيغة الإخراج النهائية:</span>
+                    <span class="font-bold bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-md border border-emerald-500/20 font-mono">Lossless PNG (.png)</span>
+                </div>
+
+                <!-- Lossless PNG Export Button -->
+                <button id="download-btn" type="button" class="w-full py-4 px-6 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm rounded-2xl shadow-xl shadow-emerald-900/30 flex items-center justify-center gap-3 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+                    <i class="fa-solid fa-download text-base"></i> تنزيل الصورة المحولة PNG
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Live Preview Area (7 cols) -->
+        <div class="lg:col-span-7 bg-slate-900/50 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center min-h-[480px] relative">
+            
+            <!-- Empty State -->
+            <div id="preview-empty" class="text-center space-y-4 py-16">
+                <div class="w-20 h-20 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center mx-auto text-3xl shadow-inner border border-slate-700">
+                    <i class="fa-regular fa-image"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-300">لم يتم اختيار أي صورة بعد</h3>
+                    <p class="text-xs text-slate-500 mt-1">قم برفع صورة لبدء الاستعراض والتحكم الفوري في المقاسات</p>
+                </div>
+            </div>
+
+            <!-- Active Preview State (Hidden by default) -->
+            <div id="preview-container" class="w-full flex flex-col items-center space-y-5 hidden">
+                
+                <!-- Detailed Image Info Bar -->
+                <div class="w-full flex flex-wrap items-center justify-between gap-3 text-xs bg-slate-950/80 px-4 py-2.5 rounded-2xl border border-slate-800">
+                    <div class="truncate max-w-[200px]">الملف: <span id="info-name" class="font-bold text-emerald-400">-</span></div>
+                    <div>الأصل: <span id="info-original-dims" class="font-bold text-slate-300 font-mono">-</span></div>
+                    <div>الحجم: <span id="info-original-size" class="font-bold text-slate-300 font-mono">-</span></div>
+                    <div>الجديد: <span id="info-new-dims" class="font-bold text-teal-400 font-mono">-</span></div>
+                </div>
+
+                <!-- Canvas Preview Wrapper (Checkerboard pattern for transparent PNG support) -->
+                <div class="relative max-h-[420px] max-w-full overflow-auto p-4 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center shadow-inner w-full" style="background-image: linear-gradient(45deg, #1e293b 25%, transparent 25%), linear-gradient(-45deg, #1e293b 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #1e293b 75%), linear-gradient(-45deg, transparent 75%, #1e293b 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;">
+                    <canvas id="canvas" class="max-w-full h-auto rounded shadow-lg object-contain"></canvas>
+                </div>
+
+                <p class="text-[11px] text-slate-400 text-center flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved text-emerald-400"></i> جميع عمليات المعالجة تتم محلياً داخل متصفحك لضمان السرعة والأمان التام للبيانات.
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer Section (Branding: IRpair, هشام عيد, 01001220551) -->
+    <footer class="py-6 px-4 text-center border-t border-slate-800 bg-slate-900/60 mt-12">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <p>جميع الحقوق محفوظة &copy; 2026 - IRpair Image Studio</p>
+            <div class="flex items-center gap-3">
+                <span>تطوير وإشراف الورشة: <strong class="text-emerald-300">هشام عيد (IRpair)</strong></span>
+                <span class="text-slate-700">|</span>
+                <a href="tel:01001220551" class="hover:text-emerald-400 transition-colors flex items-center gap-1 font-mono" dir="ltr">
+                    <i class="fa-solid fa-phone text-emerald-500"></i> 01001220551
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Toast Notification Box -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 border border-slate-700 text-slate-100 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div id="toast-icon" class="text-emerald-400 text-lg"></div>
+        <div id="toast-message" class="text-xs font-semibold"></div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('file-input');
+        const dropZone = document.getElementById('drop-zone');
+        const controlsSection = document.getElementById('controls-section');
+        const previewEmpty = document.getElementById('preview-empty');
+        const previewContainer = document.getElementById('preview-container');
+        
+        const inputWidth = document.getElementById('input-width');
+        const inputHeight = document.getElementById('input-height');
+        const lockAspectCheck = document.getElementById('lock-aspect');
+        const lockIcon = document.getElementById('lock-icon');
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        
+        const downloadBtn = document.getElementById('download-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        const infoName = document.getElementById('info-name');
+        const infoOriginalDims = document.getElementById('info-original-dims');
+        const infoOriginalSize = document.getElementById('info-original-size');
+        const infoNewDims = document.getElementById('info-new-dims');
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastMessage = document.getElementById('toast-message');
+
+        // State variables
+        let originalImage = null;
+        let originalFileName = "image";
+        let originalWidth = 0;
+        let originalHeight = 0;
+        let isUpdatingDimensions = false; // Flag to prevent infinite recursive loop
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toastIcon.innerHTML = type === 'success' 
+                ? '<i class="fa-solid fa-circle-check text-emerald-400"></i>' 
+                : '<i class="fa-solid fa-circle-exclamation text-rose-400"></i>';
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Format file size helper
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        // File Upload Handler
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadImageFromFile(file);
+            }
+        });
+
+        // Drag and Drop Events
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-emerald-500', 'bg-slate-900/90');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-emerald-500', 'bg-slate-900/90');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                loadImageFromFile(file);
+            } else {
+                showToast('يرجى اختيار ملف صورة صالح.', 'error');
+            }
+        });
+
+        function loadImageFromFile(file) {
+            originalFileName = file.name.substring(0, file.name.lastIndexOf('.')) || 'image';
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    originalImage = img;
+                    originalWidth = img.width;
+                    originalHeight = img.height;
+                    
+                    // Set inputs
+                    inputWidth.value = originalWidth;
+                    inputHeight.value = originalHeight;
+
+                    // Update UI views
+                    previewEmpty.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                    controlsSection.classList.remove('hidden');
+                    
+                    infoName.textContent = file.name;
+                    infoOriginalDims.textContent = `${originalWidth} × ${originalHeight} px`;
+                    infoOriginalSize.textContent = formatBytes(file.size);
+
+                    updateCanvas();
+                    showToast('تم تحميل الصورة بنجاح!');
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // Quick Preset Scale Buttons (25%, 50%, 75%, 100%, 200%)
+        presetButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!originalImage) return;
+                const scale = parseInt(btn.getAttribute('data-scale')) / 100;
+                
+                // Highlight active preset button
+                presetButtons.forEach(b => {
+                    b.className = "preset-btn bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-slate-300 text-xs font-bold py-2 rounded-xl transition-all border border-slate-700";
+                });
+                btn.className = "preset-btn bg-emerald-600 text-slate-950 text-xs font-black py-2 rounded-xl transition-all shadow border border-emerald-500";
+
+                inputWidth.value = Math.max(1, Math.round(originalWidth * scale));
+                inputHeight.value = Math.max(1, Math.round(originalHeight * scale));
+                updateCanvas();
+            });
+        });
+
+        // Manual Width Input Handler (Strict response to user typing unless aspect lock is checked)
+        inputWidth.addEventListener('input', () => {
+            if (isUpdatingDimensions || !originalImage) return;
+            isUpdatingDimensions = true;
+
+            let newW = parseInt(inputWidth.value);
+            if (!isNaN(newW) && newW > 0 && lockAspectCheck.checked) {
+                const ratio = originalHeight / originalWidth;
+                let newH = Math.max(1, Math.round(newW * ratio));
+                inputHeight.value = newH;
+            }
+
+            isUpdatingDimensions = false;
+            updateCanvas();
+        });
+
+        // Manual Height Input Handler (Strict response to user typing unless aspect lock is checked)
+        inputHeight.addEventListener('input', () => {
+            if (isUpdatingDimensions || !originalImage) return;
+            isUpdatingDimensions = true;
+
+            let newH = parseInt(inputHeight.value);
+            if (!isNaN(newH) && newH > 0 && lockAspectCheck.checked) {
+                const ratio = originalWidth / originalHeight;
+                let newW = Math.max(1, Math.round(newH * ratio));
+                inputWidth.value = newW;
+            }
+
+            isUpdatingDimensions = false;
+            updateCanvas();
+        });
+
+        // Lock Aspect Ratio Checkbox Toggle UI Update
+        lockAspectCheck.addEventListener('change', () => {
+            if (lockAspectCheck.checked) {
+                lockIcon.className = "fa-solid fa-link text-emerald-400";
+                // Re-sync aspect ratio based on current width immediately if turned on
+                const newW = parseInt(inputWidth.value) || originalWidth;
+                const ratio = originalHeight / originalWidth;
+                inputHeight.value = Math.max(1, Math.round(newW * ratio));
+                updateCanvas();
+            } else {
+                lockIcon.className = "fa-solid fa-link-slash text-slate-500";
+            }
+        });
+
+        // Reset Button Handler
+        resetBtn.addEventListener('click', () => {
+            if (!originalImage) return;
+            inputWidth.value = originalWidth;
+            inputHeight.value = originalHeight;
+            
+            presetButtons.forEach(b => {
+                if(b.getAttribute('data-scale') === '100') {
+                    b.className = "preset-btn bg-emerald-600 text-slate-950 text-xs font-black py-2 rounded-xl transition-all shadow border border-emerald-500";
+                } else {
+                    b.className = "preset-btn bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-slate-300 text-xs font-bold py-2 rounded-xl transition-all border border-slate-700";
+                }
+            });
+
+            updateCanvas();
+            showToast('تمت استعادة المقاسات الأصلية بنجاح.');
+        });
+
+        // Core Canvas Rendering & Resizing
+        function updateCanvas() {
+            if (!originalImage) return;
+
+            const targetW = parseInt(inputWidth.value) || originalWidth;
+            const targetH = parseInt(inputHeight.value) || originalHeight;
+
+            canvas.width = targetW;
+            canvas.height = targetH;
+
+            ctx.clearRect(0, 0, targetW, targetH);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            ctx.drawImage(originalImage, 0, 0, targetW, targetH);
+            infoNewDims.textContent = `${targetW} × ${targetH} px`;
+        }
+
+        // Lossless PNG Export Handler
+        downloadBtn.addEventListener('click', () => {
+            if (!originalImage) {
+                showToast('الرجاء اختيار صورة أولاً!', 'error');
+                return;
+            }
+
+            try {
+                const dataUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `${originalFileName}_irpair.png`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast('تم تنزيل صورة PNG بنجاح بواسطة استوديو IRpair!');
+            } catch (err) {
+                console.error(err);
+                showToast('حدث خطأ أثناء تصدير الصورة.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
+```
+eof
+
+### ملخص الإنجاز والمميزات:
+1. **الهوية الكاملة**: اسم الورشة **IRpair**، المطور **هشام عيد**، ورقم الهاتف **01001220551** مبرمجة وبارزة باحترافية تامة في الشريط العلوي والتذليل السفلي (Footer).
+2. **سحب وإفلات مرن**: دعم رفع الصور عبر السحب والإفلات أو النقر للاختيار.
+3. **أبعاد يدوية دقيقة ومستقلة**: خانات العرض والارتفاع تستجيب بدقة مطلقة لكل رقم تكتبه (مثل 256×256 أو غيرها) دون أي تعديل تلقائي مفاجئ إلا إذا قمت بنفسك بتفعيل خيار الحفاظ على الأبعاد (`Maintain Aspect Ratio`).
+4. **أزرار التحجيم السريع**: نسب (25%, 50%, 75%, 100%, 200%) للتكبير والتصغير بضغطة زر.
+5. **معاينة حية وخلفية شفافة**: Canvas تفاعلي مع خلفية مربعات هندسية لإظهار الشفافية (Transparency).
+6. **تصدير Lossless PNG**: تصدير فوري للصورة بصيغة PNG النقية مع الحفاظ الكامل على الشفافية ومعالجة محلية سريعة.
+```
